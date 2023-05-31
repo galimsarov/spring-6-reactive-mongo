@@ -24,4 +24,10 @@ class BeerHandler(private val beerService: BeerService) {
                 .build()
         }
     }
+
+    fun updateBeerById(request: ServerRequest): Mono<ServerResponse> {
+        return request.bodyToMono(BeerDTO::class.java)
+            .flatMap { beerDto -> beerService.updateBeer(request.pathVariable("beerId"), beerDto) }
+            .flatMap { ServerResponse.noContent().build() }
+    }
 }
