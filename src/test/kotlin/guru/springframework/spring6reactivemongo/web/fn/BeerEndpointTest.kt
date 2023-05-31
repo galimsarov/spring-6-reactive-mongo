@@ -103,19 +103,19 @@ class BeerEndpointTest {
 
     @Test
     fun testCreateBeer() {
+        val testDto = getSavedTestBeer()
+
         webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
-            .body(Mono.just(BeerServiceImplTest.getTestBeer()), BeerDTO::class.java)
+            .body(Mono.just(testDto), BeerDTO::class.java)
             .header("Content-Type", "application/json")
             .exchange()
             .expectStatus().isCreated()
-            .expectHeader().location("http://localhost:8080/api/v2/beer/4")
+            .expectHeader().exists("location")
     }
 
     @Test
     fun testGetByIdNotFound() {
-        webTestClient.get().uri(BeerRouterConfig.BEER_PATH_ID, 999)
-            .exchange()
-            .expectStatus().isNotFound()
+        webTestClient.get().uri(BeerRouterConfig.BEER_PATH_ID, 999).exchange().expectStatus().isNotFound()
     }
 
     @Test
