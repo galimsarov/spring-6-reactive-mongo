@@ -4,9 +4,10 @@ import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.util.*
 
 data class BeerDTO(
-    var id: String = "",
+    var id: String = UUID.randomUUID().toString(),
 
     @field:NotBlank
     @field:Size(min = 3, max = 255)

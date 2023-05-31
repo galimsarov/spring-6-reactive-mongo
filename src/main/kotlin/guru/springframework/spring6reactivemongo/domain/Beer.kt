@@ -4,11 +4,12 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import java.math.BigDecimal
 import java.time.LocalDateTime
+import java.util.*
 
 @Document
 data class Beer(
     @Id
-    var id: String = "",
+    var id: String = UUID.randomUUID().toString(),
     var beerName: String = "",
     var beerStyle: String = "",
     var upc: String = "",
