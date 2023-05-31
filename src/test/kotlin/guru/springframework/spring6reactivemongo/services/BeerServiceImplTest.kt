@@ -100,8 +100,35 @@ class BeerServiceImplTest {
         assert(emptyBeer == null)
     }
 
+    @Test
+    fun findFirstByBeerNameTest() {
+        val beerDTO = getSavedBeerDto()
+
+        val atomicBoolean = AtomicBoolean(false)
+        val foundDTO: Mono<BeerDTO> = beerService.findFirstByBeerName(beerDTO.beerName)
+
+        foundDTO.subscribe {
+            println(it.toString())
+            atomicBoolean.set(true)
+        }
+
+        Awaitility.await().untilTrue(atomicBoolean)
+    }
+
     fun getSavedBeerDto(): BeerDTO {
         return beerService.saveBeer(Mono.just(getTestBeerDto())).block() ?: BeerDTO()
+    }
+
+    @Test
+    fun testFindByBeerStyle() {
+        val beerDTO1 = getSavedBeerDto()
+        val atomicBoolean = AtomicBoolean(false)
+        beerService.findByBeerStyle(beerDTO1.beerStyle).subscribe {
+            println(it.toString())
+            atomicBoolean.set(true)
+        }
+
+        Awaitility.await().untilTrue(atomicBoolean)
     }
 
     companion object {

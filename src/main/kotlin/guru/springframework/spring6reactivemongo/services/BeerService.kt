@@ -8,9 +8,10 @@ interface BeerService {
     fun listBeers(): Flux<BeerDTO>
     fun saveBeer(beerDTO: Mono<BeerDTO>): Mono<BeerDTO>
     fun saveBeer(beerDTO: BeerDTO): Mono<BeerDTO>
-
     fun getById(beerId: String): Mono<BeerDTO>
     fun updateBeer(beerId: String, beerDTO: BeerDTO): Mono<BeerDTO>
     fun patchBeer(beerId: String, beerDTO: BeerDTO): Mono<BeerDTO>
     fun deleteBeerById(beerId: String): Mono<Void>
+    fun findFirstByBeerName(beerName: String): Mono<BeerDTO>
+    fun findByBeerStyle(beerStyle: String): Flux<BeerDTO>
 }

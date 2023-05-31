@@ -79,4 +79,12 @@ class BeerServiceImpl(private val beerRepository: BeerRepository) : BeerService 
     override fun deleteBeerById(beerId: String): Mono<Void> {
         return beerRepository.deleteById(beerId)
     }
+
+    override fun findFirstByBeerName(beerName: String): Mono<BeerDTO> {
+        return beerRepository.findFirstByBeerName(beerName).map { it.toBeerDto() }
+    }
+
+    override fun findByBeerStyle(beerStyle: String): Flux<BeerDTO> {
+        return beerRepository.findByBeerStyle(beerStyle).map { it.toBeerDto() }
+    }
 }
