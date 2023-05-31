@@ -19,10 +19,11 @@ class BeerHandler(private val beerService: BeerService) {
     }
 
     fun createNewBeer(request: ServerRequest): Mono<ServerResponse> {
-        return beerService.saveBeer(request.bodyToMono(BeerDTO::class.java)).flatMap { beerDto ->
-            ServerResponse.created(UriComponentsBuilder.fromPath(BeerRouterConfig.BEER_PATH_ID).build(beerDto.id))
-                .build()
-        }
+        return beerService.saveBeer(request.bodyToMono(BeerDTO::class.java))
+            .flatMap { beerDto ->
+                ServerResponse.created(UriComponentsBuilder.fromPath(BeerRouterConfig.BEER_PATH_ID).build(beerDto.id))
+                    .build()
+            }
     }
 
     fun updateBeerById(request: ServerRequest): Mono<ServerResponse> {
