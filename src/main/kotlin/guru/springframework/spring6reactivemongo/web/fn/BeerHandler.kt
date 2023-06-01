@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.server.ServerWebInputException
 import org.springframework.web.util.UriComponentsBuilder
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Component
@@ -25,7 +26,13 @@ class BeerHandler(private val beerService: BeerService, private val validator: V
     }
 
     fun listBeers(request: ServerRequest): Mono<ServerResponse> {
-        return ServerResponse.ok().body(beerService.listBeers(), BeerDTO::class.java)
+        val flux: Flux<BeerDTO> =
+            if (request.queryParam("beerStyle").isPresent) {
+                beerService.findByBeerStyle(request.queryParam("beerStyle").get())
+            } else {
+                beerService.listBeers()
+            }
+        return ServerResponse.ok().body(flux, BeerDTO::class.java)
     }
 
     fun getBeerById(request: ServerRequest): Mono<ServerResponse> {

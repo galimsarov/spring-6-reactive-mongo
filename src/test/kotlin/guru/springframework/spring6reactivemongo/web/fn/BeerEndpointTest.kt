@@ -2,8 +2,7 @@ package guru.springframework.spring6reactivemongo.web.fn
 
 import guru.springframework.spring6reactivemongo.model.BeerDTO
 import guru.springframework.spring6reactivemongo.services.BeerServiceImplTest
-import org.hamcrest.Matchers.greaterThan
-import org.hamcrest.Matchers.hasSize
+import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.MethodOrderer
 import org.junit.jupiter.api.Order
@@ -14,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.reactive.server.FluxExchangeResult
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 
 @AutoConfigureWebTestClient
@@ -120,12 +120,32 @@ class BeerEndpointTest {
 
     @Test
     @Order(2)
+    fun testListBeersByStyle() {
+        val beerStyle = "TEST"
+        val testDTO = getSavedTestBeer().apply { this.beerStyle = beerStyle }
+
+        webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
+            .body(Mono.just(testDTO), BeerDTO::class.java)
+            .header("Content-Type", "application/json")
+            .exchange()
+
+        webTestClient.get().uri(
+            UriComponentsBuilder.fromPath(BeerRouterConfig.BEER_PATH).queryParam("beerStyle", beerStyle).build().toUri()
+        )
+            .exchange()
+            .expectStatus().isOk
+            .expectHeader().valueEquals("Content-Type", "application/json")
+            .expectBody().jsonPath("$.size()").value(equalTo(1))
+    }
+
+    @Test
+    @Order(2)
     fun testListBeers() {
         webTestClient.get().uri(BeerRouterConfig.BEER_PATH)
             .exchange()
             .expectStatus().isOk()
             .expectHeader().valueEquals("Content-type", "application/json")
-            .expectBody().jsonPath("$.size()", hasSize<Int>(greaterThan(1)))
+            .expectBody().jsonPath("$.size()").value(greaterThan(1))
     }
 
     @Test
@@ -148,8 +168,6 @@ class BeerEndpointTest {
                 .header("Content-Type", "application/json")
                 .exchange()
                 .returnResult(BeerDTO::class.java)
-
-        val location = beerDTOFluxExchangeResult.requestHeaders["Location"]
 
         return webTestClient.get().uri(BeerRouterConfig.BEER_PATH).exchange()
             .returnResult(BeerDTO::class.java).responseBody.blockFirst() ?: BeerDTO()
