@@ -6,8 +6,6 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 interface BeerRepository : ReactiveMongoRepository<Beer, String> {
-
     fun findFirstByBeerName(beerName: String): Mono<Beer>
-
     fun findByBeerStyle(beerStyle: String): Flux<Beer>
 }
