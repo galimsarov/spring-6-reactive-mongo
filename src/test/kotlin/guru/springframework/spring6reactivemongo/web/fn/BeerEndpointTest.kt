@@ -11,7 +11,6 @@ import org.junit.jupiter.api.TestMethodOrder
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.web.reactive.server.FluxExchangeResult
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
@@ -59,8 +58,7 @@ class BeerEndpointTest {
     @Test
     @Order(4)
     fun testUpdateBeerBadRequest() {
-        val testBeer = getSavedTestBeer()
-        testBeer.beerStyle = ""
+        val testBeer = getSavedTestBeer().apply { beerStyle = "" }
 
         webTestClient.put()
             .uri(BeerRouterConfig.BEER_PATH_ID, testBeer)
@@ -91,8 +89,7 @@ class BeerEndpointTest {
 
     @Test
     fun testCreateBeerBadData() {
-        val testBeer = BeerServiceImplTest.getTestBeer()
-        testBeer.beerName = ""
+        val testBeer = BeerServiceImplTest.getTestBeer().apply { beerName = "" }
 
         webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
             .body(Mono.just(testBeer), BeerDTO::class.java)
@@ -162,12 +159,11 @@ class BeerEndpointTest {
 
 
     fun getSavedTestBeer(): BeerDTO {
-        val beerDTOFluxExchangeResult: FluxExchangeResult<BeerDTO> =
-            webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
-                .body(Mono.just(BeerServiceImplTest.getTestBeer()), BeerDTO::class.java)
-                .header("Content-Type", "application/json")
-                .exchange()
-                .returnResult(BeerDTO::class.java)
+        webTestClient.post().uri(BeerRouterConfig.BEER_PATH)
+            .body(Mono.just(BeerServiceImplTest.getTestBeer()), BeerDTO::class.java)
+            .header("Content-Type", "application/json")
+            .exchange()
+            .returnResult(BeerDTO::class.java)
 
         return webTestClient.get().uri(BeerRouterConfig.BEER_PATH).exchange()
             .returnResult(BeerDTO::class.java).responseBody.blockFirst() ?: BeerDTO()
